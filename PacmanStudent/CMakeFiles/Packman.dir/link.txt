@@ -1,0 +1,1 @@
+/usr/bin/cc  -I/usr/local/include/SDL2 -D_REENTRANT   CMakeFiles/Packman.dir/main.c.o  -o Packman -rdynamic -lGL -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL2 -lpthread -lSDL2_image 

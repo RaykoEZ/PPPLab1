@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/s4903744/PPP/Assignments/PacmanStudent/main.c
+SDL.h
+-
+SDL_image.h
+-
+stdio.h
+-
+stdlib.h
+-
+map.h
+/home/s4903744/PPP/Assignments/PacmanStudent/map.h
+
+/home/s4903744/PPP/Assignments/PacmanStudent/map.h
+
