@@ -13,8 +13,99 @@ const int BLOCKSIZE=25;
 // an enumeration for direction to move USE more enums!
 enum DIRECTION{UP,DOWN,LEFT,RIGHT,NONE};
 
+//Function for drawing map tiles and Pacman~
+void DrawMap(SDL_Renderer *ren){
+    SDL_Rect block;
+    for(int row=0;row<ROWS;++row){
+        for(int col=0;col<COLS;++col){
+    //dynamically assign block position on the map for drawing
+            block.x=col*BLOCKSIZE;
+            block.y=row*BLOCKSIZE;
+            block.w=BLOCKSIZE;
+            block.h=BLOCKSIZE;
+            if (map[row][col]==2){
+    //draw floor block and colour according to the map's index
+                SDL_SetRenderDrawColor(ren,0,0,0,0);
+                SDL_RenderFillRect(ren,&block);
+    //Reassign coin block for drawing coins(them collectables and stuff~)
+                block.w=(BLOCKSIZE)/2;
+                block.h=(BLOCKSIZE)/2;
+                block.x=(col*BLOCKSIZE)+(BLOCKSIZE/4);
+                block.y=(row*BLOCKSIZE)+(BLOCKSIZE/4);
+                SDL_SetRenderDrawColor(ren,255,255,255,255);
+                SDL_RenderFillRect(ren,&block);
+
+            }
+            else if(map[row][col]==1){
+    //draw wall block and colour according to the map's index
+                SDL_SetRenderDrawColor(ren,50,205,50,255);
+                SDL_RenderFillRect(ren,&block);
+            }
+            else if(map[row][col]==0){
+    //draw space block and colour according to the map's index
+                SDL_SetRenderDrawColor(ren,115, 91, 60,255);
+                SDL_RenderFillRect(ren,&block);
+            }
+            else{
+                printf("Failing to draw blocks, please help me with map indexing! OTZ");
+
+            }
 
 
+        }
+    }
+}
+void DrawPMan(SDL_Renderer *ren, SDL_Texture *tex, SDL_Rect *block){
+    // now we need to create a rect for the texture.
+    SDL_Rect pacman;
+    // each sprite is 22 x 20 so set the width and height
+    pacman.w=22;
+    pacman.h=20;
+    // now we calculate the offset into the sprite sheet for one of the
+    // sprites 2nd across 3rd down should really define something for the
+    // sprite size ;-)
+    pacman.x=2*22;
+    pacman.y=3*20;
+    // finally draw using the SDL_RenderCopy function
+    // takes the texture and copies the portion from the pacman rect to block rect
+    SDL_RenderCopy(ren, tex,&pacman, block);
+
+
+}
+
+void MovePMan(int Direction, SDL_Rect *block){
+    int MoveInterval=1;
+    int Velocity=6;
+    if(Direction==UP){
+        ColliCheck();
+        block->y+= -MoveInterval*Velocity;
+        printf("\n PAC POSITION:\n x:%d y:%d",block->x,block->y);
+
+    }
+    else if(Direction==DOWN){
+        ColliCheck();
+        block->y+= MoveInterval*Velocity;
+        printf("\n PAC POSITION:\n x:%d y:%d",block->x,block->y);
+    }
+
+    else if(Direction==LEFT){
+        ColliCheck();
+        block->x-= MoveInterval*Velocity;
+        printf("\n PAC POSITION:\n x:%d y:%d",block->x,block->y);
+    }
+
+    else if(Direction==RIGHT){
+        ColliCheck();
+        block->x+=MoveInterval*Velocity;
+        printf("\n PAC POSITION:\n x:%d y:%d",block->x,block->y);
+    }
+    else return;
+
+
+}
+int ColliCheck(){
+
+}
 int main()
 {
   // initialise SDL and check that it worked otherwise exit
@@ -46,11 +137,7 @@ int main()
   // this will set the background colour to white.
   // however we will overdraw all of this so only for reference
   SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-
-  // SDL image is an abstraction for all images
   SDL_Surface *image;
-  // we are going to use the extension SDL_image library to load a png, documentation can be found here
-  // http://www.libsdl.org/projects/SDL_image/
   image=IMG_Load("pacsprite.png");
   if(!image)
   {
@@ -59,19 +146,24 @@ int main()
   }
   // SDL texture converts the image to a texture suitable for SDL rendering  / blitting
   // once we have the texture it will be store in hardware and we don't need the image data anymore
-
   SDL_Texture *tex = 0;
   tex = SDL_CreateTextureFromSurface(ren, image);
   // free the image
   SDL_FreeSurface(image);
-
-
-
   int quit=0;
   // now we are going to loop forever, process the keys then draw
+  SDL_Rect block;
+  //The movement Interval for the pacman per direction input
+  block.w=BLOCKSIZE;
+  block.h=BLOCKSIZE;
+  // first re-position the block position
+  block.x=1*BLOCKSIZE;
+  block.y=1*BLOCKSIZE;
 
+  //Game Loop
   while (quit !=1)
   {
+
     SDL_Event event;
     // grab the SDL even (this will be keys etc)
     while (SDL_PollEvent(&event))
@@ -84,53 +176,33 @@ int main()
       {
         switch (event.key.keysym.sym)
         {
+
         // if we have an escape quit
         case SDLK_ESCAPE : quit=1; break;
+        case SDLK_w : MovePMan(UP,&block);break;
+        case SDLK_a : MovePMan(LEFT,&block);break;
+        case SDLK_s : MovePMan(DOWN,&block);break;
+        case SDLK_d : MovePMan(RIGHT,&block);break;
+
         // add other key control here (all begin with SDLK_)
        }
     }
   }
-
-  // now we clear the screen (will use the clear colour set previously)
-  SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-  SDL_RenderClear(ren);
-  // we will create an SDL_Rect structure and draw a block
-  SDL_Rect block;
-  // set the block position
-  block.x=100;
-  block.y=50;
-  block.w=BLOCKSIZE;
-  block.h=BLOCKSIZE;
-  SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
-  SDL_RenderFillRect(ren,&block);
-  // now to draw an element of the sprite sheet
-  // first re-position the block position
-  block.x=200;
-  block.y=150;
-  // now we need to create a rect for the texture.
-  SDL_Rect pacman;
-  // each sprite is 22 x 20 so set the width and height
-  pacman.w=22;
-  pacman.h=20;
-  // now we calculate the offset into the sprite sheet for one of the
-  // sprites 2nd across 3rd down should really define something for the
-  // sprite size ;-)
-  pacman.x=2*22;
-  pacman.y=3*20;
-  // finally draw using the SDL_RenderCopy function
-  // this takes the texture and copies the portion from the rect
-  SDL_RenderCopy(ren, tex,&pacman, &block);
-  // your job is now to use functions, good coding practice data structures
-  // and read the SDL documentation to complete the project!
-  // good luck
-
-  // Up until now everything was drawn behind the scenes.
-  // This will show the new, red contents of the window.
-  SDL_RenderPresent(ren);
-
+      // now we clear the screen (will use the clear colour set previously)
+      SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+      SDL_RenderClear(ren);
+      //calling DrawMap function to draw map tiles
+      DrawMap(ren);
+      //calling drawPackman function to draw pacman
+      DrawPMan(ren,tex,&block);
+      //Up until now everything was drawn behind the scenes.
+      //This will show the new, red contents of the window.
+      SDL_RenderPresent(ren);
   }
 
 
   SDL_Quit();
   return EXIT_SUCCESS;
 }
+
+
