@@ -2,6 +2,8 @@
 #define MAP_H_
 #define ROWS 31
 #define COLS 28
+//Prototype for Collision check function for Movement function to not warm me of Implicit Declaration
+int ColliCheck(int XCoord,int YCoord,int Direction);
 // header created by maptool 
 char map[ROWS][COLS]={
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,},
